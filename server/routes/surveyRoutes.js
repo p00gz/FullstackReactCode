@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const Path = require('path-parser');
+const { Path } = require('path-parser');
 const { URL } = require('url');
 const mongoose = require('mongoose');
 const requireLogin = require('../middlewares/requireLogin');
@@ -9,7 +9,7 @@ const surveyTemplate = require('../services/emailTemplates/surveyTemplate');
 
 const Survey = mongoose.model('surveys');
 
-module.exports = app => {
+module.exports = (app) => {
   app.get('/api/surveys/thanks', (req, res) => {
     res.send('Thanks for voting!');
   });
@@ -31,12 +31,12 @@ module.exports = app => {
           {
             _id: surveyId,
             recipients: {
-              $elemMatch: { email: email, responded: false }
-            }
+              $elemMatch: { email: email, responded: false },
+            },
           },
           {
             $inc: { [choice]: 1 },
-            $set: { 'recipients.$.responded': true }
+            $set: { 'recipients.$.responded': true },
           }
         ).exec();
       })
@@ -52,9 +52,11 @@ module.exports = app => {
       title,
       subject,
       body,
-      recipients: recipients.split(',').map(email => ({ email: email.trim() })),
+      recipients: recipients
+        .split(',')
+        .map((email) => ({ email: email.trim() })),
       _user: req.user.id,
-      dateSent: Date.now()
+      dateSent: Date.now(),
     });
 
     // Great place to send an email!
